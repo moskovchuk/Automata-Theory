@@ -1,0 +1,66 @@
+%start MainMap::Start
+%class AppClass
+%header AppClass.h
+
+%map MainMap
+%%
+Start {
+            letter (let: char)                     nil             { AppendStr(let); }
+            dots   (dts: char) [ctxt.title()]      type_contact    { AppendStr(dts); }
+}
+
+type_contact {
+            letter (let: char)                     nil             { AppendType(let); }
+            question (quest: char) [ctxt.type()]   state_1         { AppendStr(quest); }
+}
+
+state_1 {
+            letter (let: char) [let == 'j' || let == 'J'] state_2  { AppendStr(let); }
+}
+
+state_2 {
+           letter (let: char) [let == 'i' || let == 'I'] state_3  { AppendStr(let); }
+}
+
+state_3 {
+            letter (let: char) [let == 'd' || let == 'D'] state_4  { AppendStr(let); }
+}
+
+state_4 {
+            equal (equ: char)                       user_name      { AppendStr(equ); }
+}
+
+user_name {
+            letter   (let:     char)                nil            { AppendStr(let); }
+            digit    (dig:     char)                nil            { AppendStr(dig); }
+            dog      (dg:      char)                server_name    { AppendStr(dg);  }
+}
+
+server_name {
+            letter   (let:     char)                nil            { AppendServer(let); }
+            digit    (dig:     char)                nil            { AppendServer(dig); }
+            dot      (dt:     char)                 zone_name      { AppendStr(dt); }
+}
+
+zone_name {
+            letter   (let:     char)                nil            { AppendZone(let); }
+            EOS [ctxt.NotTooLong()]                 OK             { UpdateStatistic(); setAcceptable(); }
+}
+
+Error {}
+
+OK {}
+
+Default{
+			restart				                                Start			    { ClearCash(); }
+			letter   (let:   char)                              Error               { AppendStr(let); }
+            digit    (dig:   char)			                    Error    	        { AppendStr(dig); }     
+            dots     (dts:   char)                              Error               { AppendStr(dts); }
+            dot      (dt:   char)                               Error               { AppendStr(dt); }
+            equal    (equ: char)                                Error               { AppendStr(equ); }
+            question (quest: char)                              Error               { AppendStr(quest); }
+            dog      (dg:      char)                            Error               { AppendStr(dg); }
+            EOS				                                    Error			    { }
+			unknown	 (unk:   char)                              Error			    { AppendStr(unk); }
+} 
+%%
